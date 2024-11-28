@@ -81,7 +81,12 @@ const AddUpdateTrafficSources = () => {
           setState(response.data.data);
           setStatus(response.data.data.status);
         } else {
-          alert(JSON.stringify(response.data.message));
+          const message = response.data.message;
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
         }
       });
     }
@@ -103,8 +108,19 @@ const AddUpdateTrafficSources = () => {
         url: addUpdateTrafficSource(),
         data: formData,
       }).then((response) => {
-        alert(response.data.message);
-        window.location.href = '/traffic-sources';
+        if (response.data.errorCode == 0) {
+          alert(response.data.message);
+          window.location.href = '/traffic-sources';
+        }
+        else {
+          const message = response.data.message;
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
+        }
+        setLoading(false);
       });
     }
   };
@@ -134,6 +150,14 @@ const AddUpdateTrafficSources = () => {
       setLoading(false);
       if (response.data.errorCode === 0) {
         window.location.href = '/traffic-sources';
+      }
+      else {
+        const message = response.data.message;
+        alert(message);
+        if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          // Redirect to /session/signin
+          window.location.href = '/session/signin';
+        }
       }
     });
   };

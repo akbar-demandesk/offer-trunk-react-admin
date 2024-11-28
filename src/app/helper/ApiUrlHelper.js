@@ -63,11 +63,11 @@ const updateUser = () => {
   return baseUrl + 'user/updateUser';
 };
 const forgotPassword = () => {
-  return baseUrl + 'api/forgotPassword'
-}
+  return baseUrl + 'api/forgotPassword';
+};
 const resetPassword = () => {
-  return baseUrl + 'api/resetPassword'
-}
+  return baseUrl + 'api/resetPassword';
+};
 // Student
 const getStudents = () => {
   return baseUrl + 'bisme/getStudents';
@@ -111,7 +111,7 @@ const generateReceiptsTB = () => {
 };
 
 export {
-  loginUrl, 
+  loginUrl,
   getAllNetworks,
   getNetwork,
   addUpdateNetwork,

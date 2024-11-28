@@ -83,11 +83,16 @@ const OfferTable = () => {
         url: getOffers(),
         data: { network_id: id },
       }).then((response) => {
+        const message = response.data.message;
         if (response.data.data) {
           setRowData(response.data.data);
           setDropDown(response.data.data);
         } else {
-          alert(response.data.message);
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
         }
         setLoading(false);
       });
@@ -98,11 +103,16 @@ const OfferTable = () => {
         url: getAllOffers(),
         data: {},
       }).then((response) => {
+        const message = response.data.message;
         if (response.data.data) {
           setRowData(response.data.data);
           setDropDown(response.data.data);
         } else {
-          alert(response.data.message);
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
         }
         setLoading(false);
       });

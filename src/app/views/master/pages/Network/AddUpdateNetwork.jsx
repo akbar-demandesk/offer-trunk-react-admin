@@ -84,7 +84,13 @@ const AddUpdateNetwork = () => {
           setState(response.data.data);
           setStatus(response.data.data.status);
         } else {
-          alert(JSON.stringify(response.data.message));
+          const message = response.data.message;
+          alert(message);
+          if (["Invalid Token", "Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            window.location.href = '/session/signin';
+          } else {
+            alert(JSON.stringify(message));
+          }
         }
         setLoading(false);
       });
@@ -112,8 +118,17 @@ const AddUpdateNetwork = () => {
         url: addUpdateNetwork(),
         data: formData,
       }).then((response) => {
-        alert(response.data.message);
-        window.location.href = '/network';
+        const message = response.data.message;
+        alert(message);
+        if (response.data.errorCode == 0) {
+          window.location.href = '/network';
+        }
+        else {
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            window.location.href = '/session/signin';
+          }
+          setLoading(false);
+        }
       }).catch((error) => {
         console.error('Error submitting form:', error);
         setLoading(false);
@@ -143,10 +158,18 @@ const AddUpdateNetwork = () => {
       url: deleteNetwork(),
       data: { id: id, remarks: remarks },
     }).then((response) => {
-      alert(response.data.message);
       setLoading(false);
       if (response.data.errorCode === 0) {
+        alert(response.data.message);
         window.location.href = '/network';
+      }
+      else {
+        const message = response.data.message;
+        alert(message);
+        if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          // Redirect to /session/signin
+          window.location.href = '/session/signin';
+        }
       }
     });
   };

@@ -78,7 +78,12 @@ const AddUpdateOffer = () => {
       if (response.data.data) {
         setNetworks(response.data.data);
       } else {
-        alert(response.data.message);
+        const message = response.data.message;
+        alert(message);
+        if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          // Redirect to /session/signin
+          window.location.href = '/session/signin';
+        }
       }
     });
 
@@ -93,7 +98,12 @@ const AddUpdateOffer = () => {
           setState(response.data.data);
           setStatus(response.data.data.status);
         } else {
-          alert(JSON.stringify(response.data.message));
+          const message = response.data.message;
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
         }
       });
     }
@@ -115,10 +125,17 @@ const AddUpdateOffer = () => {
         url: addUpdateOffer(),
         data: formData,
       }).then((response) => {
-        alert(response.data.message);
         setLoading(false);
         if (response.data.errorCode === 0) {
+          alert(response.data.message);
           window.location.href = roleid != 2 ? '/network' : '/offer';
+        } else {
+          const message = response.data.message;
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
         }
       });
     }
@@ -145,10 +162,18 @@ const AddUpdateOffer = () => {
       url: deleteOffer(),
       data: { id: id, remarks: remarks },
     }).then((response) => {
-      alert(response.data.message);
       setLoading(false);
       if (response.data.errorCode === 0) {
+        alert(response.data.message);
         window.location.href = roleid != 2 ? '/network' : '/offer';
+      }
+      else {
+        const message = response.data.message;
+        alert(message);
+        if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          // Redirect to /session/signin
+          window.location.href = '/session/signin';
+        }
       }
     });
   };

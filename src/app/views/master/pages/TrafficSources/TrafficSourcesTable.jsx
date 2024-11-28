@@ -77,7 +77,12 @@ const TrafficSourcesTable = () => {
           setOriginalRowData(response.data.data);
           setDropDown(response.data.data);
         } else {
-          alert(response.data.message);
+          const message = response.data.message;
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
         }
       } catch (error) {
         alert(error.message);

@@ -260,7 +260,12 @@ const AddUpdateTrafficSources = () => {
         setState(response.data.data);
         setInputCountryValue(response.data.data.country);
       } else {
-        alert(JSON.stringify(response.data.message));
+        const message = response.data.message;
+        alert(message);
+        if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          // Redirect to /session/signin
+          window.location.href = '/session/signin';
+        }
       }
     });
 
@@ -277,8 +282,18 @@ const AddUpdateTrafficSources = () => {
         url: updateUser(),
         data: state,
       }).then((response) => {
-        alert(response.data.message);
-        window.location.href = '/profile';
+        if (response.data.errorCode == 0) {
+          alert(response.data.message);
+          window.location.href = '/profile';
+        }
+        else {
+          const message = response.data.message;
+          alert(message);
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            // Redirect to /session/signin
+            window.location.href = '/session/signin';
+          }
+        }
       });
     }
   };
