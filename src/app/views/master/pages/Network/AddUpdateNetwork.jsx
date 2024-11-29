@@ -80,16 +80,17 @@ const AddUpdateNetwork = () => {
         url: getNetwork(),
         data: { id: id },
       }).then((response) => {
-        if (response.data.data) {
+        if (response.data.errorCode == 0) {
           setState(response.data.data);
           setStatus(response.data.data.status);
         } else {
           const message = response.data.message;
-          alert(message);
-          if (["Invalid Token", "Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
+            // Redirect to /session/signin
             window.location.href = '/session/signin';
           } else {
-            alert(JSON.stringify(message));
+            alert(message);
           }
         }
         setLoading(false);
@@ -119,15 +120,18 @@ const AddUpdateNetwork = () => {
         data: formData,
       }).then((response) => {
         const message = response.data.message;
-        alert(message);
         if (response.data.errorCode == 0) {
+          alert(message);
           window.location.href = '/network';
         }
         else {
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
+            // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
-          setLoading(false);
         }
       }).catch((error) => {
         console.error('Error submitting form:', error);
@@ -165,10 +169,12 @@ const AddUpdateNetwork = () => {
       }
       else {
         const message = response.data.message;
-        alert(message);
         if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          alert("Session Expired, please relogin");
           // Redirect to /session/signin
           window.location.href = '/session/signin';
+        } else {
+          alert(message);
         }
       }
     });

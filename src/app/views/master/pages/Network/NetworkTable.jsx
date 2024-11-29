@@ -72,16 +72,19 @@ const NetworkTable = () => {
         url: getNetworksByUser(),
         data: null,
       }).then((response) => {
-        if (response.data.data) {
+        console.log(response);
+        if (response.data.errorCode == 0) {
           setRowData(response.data.data);
           setDropDown(response.data.data);
           setFilteredData(response.data.data);
         } else {
           const message = response.data.message;
-          alert(message);
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
         setLoading(false);
@@ -93,16 +96,18 @@ const NetworkTable = () => {
         url: getAllNetworks(),
         data: null,
       }).then((response) => {
-        if (response.data.data) {
+        if (response.data.errorCode == 0) {
           setRowData(response.data.data);
           setDropDown(response.data.data);
           setFilteredData(response.data.data);
         } else {
           const message = response.data.message;
-          alert(message);
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
         setLoading(false);

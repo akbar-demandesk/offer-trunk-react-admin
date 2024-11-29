@@ -75,14 +75,16 @@ const AddUpdateOffer = () => {
       url: fetchNetworks,
       data: {},
     }).then((response) => {
-      if (response.data.data) {
+      if (response.data.errorCode == 0) {
         setNetworks(response.data.data);
       } else {
         const message = response.data.message;
-        alert(message);
         if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          alert("Session Expired, please relogin");
           // Redirect to /session/signin
           window.location.href = '/session/signin';
+        } else {
+          alert(message);
         }
       }
     });
@@ -94,15 +96,17 @@ const AddUpdateOffer = () => {
         url: getOffer(),
         data: { id: id },
       }).then((response) => {
-        if (response.data.data) {
+        if (response.data.errorCode == 0) {
           setState(response.data.data);
           setStatus(response.data.data.status);
         } else {
           const message = response.data.message;
-          alert(message);
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
       });
@@ -131,10 +135,12 @@ const AddUpdateOffer = () => {
           window.location.href = roleid != 2 ? '/network' : '/offer';
         } else {
           const message = response.data.message;
-          alert(message);
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
       });
@@ -163,16 +169,18 @@ const AddUpdateOffer = () => {
       data: { id: id, remarks: remarks },
     }).then((response) => {
       setLoading(false);
-      if (response.data.errorCode === 0) {
+      if (response.data.errorCode == 0) {
         alert(response.data.message);
         window.location.href = roleid != 2 ? '/network' : '/offer';
       }
       else {
         const message = response.data.message;
-        alert(message);
         if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          alert("Session Expired, please relogin");
           // Redirect to /session/signin
           window.location.href = '/session/signin';
+        } else {
+          alert(message);
         }
       }
     });

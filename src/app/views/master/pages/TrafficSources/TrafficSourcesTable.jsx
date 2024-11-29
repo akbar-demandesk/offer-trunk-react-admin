@@ -72,16 +72,18 @@ const TrafficSourcesTable = () => {
           await axios.post(getTrafficSources(), null, { headers: { token: localStorage.getItem('accessToken'), roleId: localStorage.getItem('roleId') } }) :
           await axios.post(getAllTrafficSource(), null, { headers: { token: localStorage.getItem('accessToken'), roleId: localStorage.getItem('roleId') } });
 
-        if (response.data.data) {
+        if (response.data.errorCode == 0) {
           setRowData(response.data.data);
           setOriginalRowData(response.data.data);
           setDropDown(response.data.data);
         } else {
           const message = response.data.message;
-          alert(message);
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
       } catch (error) {

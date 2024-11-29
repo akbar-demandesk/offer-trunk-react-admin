@@ -83,15 +83,17 @@ const OfferTable = () => {
         url: getOffers(),
         data: { network_id: id },
       }).then((response) => {
-        const message = response.data.message;
-        if (response.data.data) {
+        if (response.data.errorCode == 0) {
           setRowData(response.data.data);
           setDropDown(response.data.data);
         } else {
-          alert(message);
+          const message = response.data.message;
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
         setLoading(false);
@@ -103,15 +105,17 @@ const OfferTable = () => {
         url: getAllOffers(),
         data: {},
       }).then((response) => {
-        const message = response.data.message;
-        if (response.data.data) {
+        if (response.data.errorCode == 0) {
           setRowData(response.data.data);
           setDropDown(response.data.data);
         } else {
-          alert(message);
+          const message = response.data.message;
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
         setLoading(false);

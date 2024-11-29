@@ -255,16 +255,18 @@ const AddUpdateTrafficSources = () => {
       url: getUser(),
       data: {},
     }).then((response) => {
-      if (response.data.data) {
+      if (response.data.errorCode == 0) {
         // alert(JSON.stringify(response.data.data))
         setState(response.data.data);
         setInputCountryValue(response.data.data.country);
       } else {
         const message = response.data.message;
-        alert(message);
         if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+          alert("Session Expired, please relogin");
           // Redirect to /session/signin
           window.location.href = '/session/signin';
+        } else {
+          alert(message);
         }
       }
     });
@@ -288,10 +290,12 @@ const AddUpdateTrafficSources = () => {
         }
         else {
           const message = response.data.message;
-          alert(message);
           if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
+            alert("Session Expired, please relogin");
             // Redirect to /session/signin
             window.location.href = '/session/signin';
+          } else {
+            alert(message);
           }
         }
       });
