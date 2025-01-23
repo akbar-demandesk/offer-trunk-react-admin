@@ -1,9 +1,21 @@
 // const baseUrl = 'http://localhost:3001/';
-// const baseUrl = 'http://154.62.109.243:3005/';
 const baseUrl = 'https://offertrunk.com/';
 
 const loginUrl = () => {
   return baseUrl + 'api/login';
+};
+
+// Categories
+const getCategories = () => {
+  return baseUrl + 'user/getCategories';
+};
+
+const createUpdateCategory = () => {
+  return baseUrl + 'user/createUpdateCategory';
+};
+
+const deleteCategory = () => {
+  return baseUrl + 'user/deleteCategory';
 };
 
 // Network
@@ -143,4 +155,7 @@ export {
   generateReceipt,
   generateReceiptsTB,
   csvUpload,
+  createUpdateCategory,
+  getCategories,
+  deleteCategory,
 };

@@ -12,11 +12,17 @@ const AddUpdateNetwork = Loadable(lazy(() => import('./pages/Network/AddUpdateNe
 const OfferTable = Loadable(lazy(() => import('./pages/Network/Offer/OfferTable')));
 const AddUpdateOffer = Loadable(lazy(() => import('./pages/Network/Offer/AddUpdateOffer')));
 
-// Traffic Sources
-const TrafficSourcesTable = Loadable(lazy(() => import('./pages/TrafficSources/TrafficSourcesTable')));
-const AddUpdateTrafficSources = Loadable(lazy(() => import('./pages/TrafficSources/AddUpdateTrafficSources')));
-const Profile = Loadable(lazy(() => import('./pages/Profile/Profile')));
+// Categories
+const CategoriesTable = Loadable(lazy(() => import('./pages/Categories/CategoriesTable')));
 
+// Traffic Sources
+const TrafficSourcesTable = Loadable(
+  lazy(() => import('./pages/TrafficSources/TrafficSourcesTable'))
+);
+const AddUpdateTrafficSources = Loadable(
+  lazy(() => import('./pages/TrafficSources/AddUpdateTrafficSources'))
+);
+const Profile = Loadable(lazy(() => import('./pages/Profile/Profile')));
 
 // Students
 const StudentTable = Loadable(lazy(() => import('./pages/Students/StudentTable')));
@@ -68,19 +74,26 @@ const masterRoutes = [
     path: '/AddUpdateOffer',
     element: <AddUpdateOffer />,
   },
-    // Network
-    {
-      path: '/traffic-sources',
-      element: <TrafficSourcesTable />,
-    },
-    {
-      path: '/AddUpdateTrafficSources',
-      element: <AddUpdateTrafficSources />,
-    },
-    {
-      path: '/profile',
-      element: <Profile />,
-    },
+
+  // Categories
+
+  {
+    path: '/categories',
+    element: <CategoriesTable />,
+  },
+  // Network
+  {
+    path: '/traffic-sources',
+    element: <TrafficSourcesTable />,
+  },
+  {
+    path: '/AddUpdateTrafficSources',
+    element: <AddUpdateTrafficSources />,
+  },
+  {
+    path: '/profile',
+    element: <Profile />,
+  },
 
   // Students
   {

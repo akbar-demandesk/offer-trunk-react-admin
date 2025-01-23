@@ -239,6 +239,8 @@ const OfferTable = () => {
                     {roleid == 2 && (<>
                       <TableCell align="Left">Network</TableCell>
                     </>)}
+                    <TableCell align="Left">Categories</TableCell>
+                    <TableCell align="Left">Countries</TableCell>
                     <TableCell align="left">URL</TableCell>
                     <TableCell align="center">Status</TableCell>
                     <TableCell align="center">Action</TableCell>
@@ -253,7 +255,13 @@ const OfferTable = () => {
                         {roleid == 2 && (<>
                           <TableCell align="Left">{subscriber.network_name}</TableCell>
                         </>)}
-                        <TableCell align="left">{subscriber.offer_link}</TableCell>
+                        <TableCell align="Left">{subscriber.category_names}</TableCell>
+                        <TableCell align="Left">{subscriber.geo}</TableCell>
+
+                        <TableCell align="left" sx={{ textTransform: 'lowercase !important' }}>
+                          {subscriber.offer_link}
+                        </TableCell>
+
                         <TableCell align="center" style={{ color: getStatusColor(subscriber.status) }}>
                           {getStatusLabel(subscriber.status)}
                         </TableCell>
