@@ -25,9 +25,11 @@ const Brand = ({ children }) => {
     <BrandRoot>
       <Box display="flex" alignItems="center">
         <StyledSpan mode={mode} className="sidenavHoverShow">
-          OfferTrunk
-          {/* <img src="./logo.png" width={200} alt="" /> */}
+          {/* OfferTrunk */}
+          <img src="../logo.png" width={190} alt="" />
         </StyledSpan>
+
+        <hr />
       </Box>
 
       {/* <Box className="sidenavHoverShow" sx={{ display: mode === 'compact' ? 'none' : 'block' }}>

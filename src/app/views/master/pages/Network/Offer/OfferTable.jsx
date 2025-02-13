@@ -67,7 +67,10 @@ const OfferTable = () => {
   const [statusFilter, setStatusFilter] = useState(null); // Status Filter
   const [nameFilter, setNameFilter] = useState([]); // Name Filter
   const [page, setPage] = useState(0); // Pagination
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Pagination
+  const [rowsPerPage, setRowsPerPage] = useState(() => {
+    const storedRows = localStorage.getItem('rowsPerPage');
+    return storedRows ? parseInt(storedRows, 10) : 10;
+  });
   const [loading, setLoading] = useState(false); // For Loader
 
   let navigation = useNavigate();
@@ -129,6 +132,7 @@ const OfferTable = () => {
   };
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
+    localStorage.setItem('rowsPerPage', event.target.value);
     setPage(0);
   };
 
@@ -289,7 +293,7 @@ const OfferTable = () => {
                 rowsPerPage={rowsPerPage}
                 count={filteredRowData.length}
                 onPageChange={handleChangePage}
-                rowsPerPageOptions={[5, 10, 25]}
+                rowsPerPageOptions={[5, 10, 25, 50]}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 nextIconButtonProps={{ 'aria-label': 'Next Page' }}
                 backIconButtonProps={{ 'aria-label': 'Previous Page' }}

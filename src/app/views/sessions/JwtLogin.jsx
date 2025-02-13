@@ -19,7 +19,7 @@ const ContentBox = styled(Box)(() => ({
 }));
 
 const JWTRoot = styled(JustifyBox)(() => ({
-  backgroundImage: 'url("/assets/images/dots.png"),linear-gradient(to bottom, #bd8e21, #ddd7c2);)',
+  backgroundImage: 'url("/assets/images/circles.png"),linear-gradient(to bottom, #0a64bc,rgb(90, 160, 231));)',
   backgroundRepeat: 'no-repeat',
   backgroundSize: 'cover',
   minHeight: '100% !important',
@@ -81,7 +81,7 @@ const JwtLogin = () => {
         <Grid container>
           <Grid item sm={12} xs={12}>
             <ContentBox>
-              <img src="/logo.png" width={400} alt="" />
+              <img src="/logo2.png" width={400} alt="" />
               <Formik
                 onSubmit={handleFormSubmit}
                 initialValues={initialValues}
@@ -122,7 +122,7 @@ const JwtLogin = () => {
                     <FlexBox justifyContent="space-between">
                       <NavLink
                         to="/session/forgot-password"
-                        style={{ color: '#613b25', textDecoration: 'none' }}
+                        style={{ color: '#0a64bc', textDecoration: 'none' }}
                       >
                         Forgot password?
                       </NavLink>
@@ -135,10 +135,10 @@ const JwtLogin = () => {
                       sx={{
                         my: 2,
                         width: 1,
-                        backgroundColor: '#613b25',
+                        backgroundColor: '#0a64bc',
                         color: '#fff',
                         '&:hover': {
-                          backgroundColor: '#8b6140', // Lighter shade for hover effect
+                          backgroundColor: '#0081ff', // Lighter shade for hover effect
                         },
                       }}
                     >

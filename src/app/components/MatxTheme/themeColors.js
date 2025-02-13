@@ -50,7 +50,7 @@ export const themeColors = {
         contrastText: textLight.success,
       },
       secondary: {
-        main: '#613b25',
+        main: '#0a64bc',
         contrastText: '#ffffff',
       },
       background: {
@@ -175,7 +175,7 @@ export const themeColors = {
     palette: {
       type: 'light',
       success: {
-        main: '#613b25',
+        main: '#0a64bc',
         contrastText: '#ffffff',
       },
       secondary: {
@@ -194,7 +194,7 @@ export const themeColors = {
     palette: {
       type: 'dark',
       success: {
-        main: '#613b25',
+        main: '#0a64bc',
         contrastText: '#ffffff',
       },
       secondary: {

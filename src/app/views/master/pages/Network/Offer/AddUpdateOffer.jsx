@@ -36,6 +36,9 @@ import {
 // 1) Insert the full COUNTRY_LIST array somewhere accessible
 // You can place this array at the top of your file or in a separate file.
 const COUNTRY_LIST = [
+  { code: 'LATAM', name: 'LATAM' },
+  { code: 'APAC', name: 'APAC' },
+  { code: 'EMEA', name: 'EMEA' },
   { code: 'International', name: 'International' },
   { code: 'AF', name: 'Afghanistan' },
   { code: 'AX', name: 'Åland Islands' },
@@ -473,8 +476,12 @@ const AddUpdateOffer = () => {
 
     setLoading(true);
 
+    // alert(JSON.stringify(state));
+
+    const { category_ids, ...rest } = state;
+
     const formData = new FormData();
-    for (const key in state) {
+    for (const key in rest) {
       formData.append(key, state[key]);
     }
 
@@ -487,6 +494,9 @@ const AddUpdateOffer = () => {
 
     // Countries as JSON string (e.g. ["US","GB","IN"])
     formData.set('geo', JSON.stringify(selectedCountries));
+
+    // console.log('[DEBUG] Final categoryIds to be sent:', categoryIds);
+    // console.log('[DEBUG] formData category_ids:', formData.getAll('category_ids[]'));
 
     axios({
       method: 'post',
@@ -742,7 +752,10 @@ const AddUpdateOffer = () => {
                     getOptionLabel={(option) => option.name}
                     value={allCategories.filter((cat) => categoryIds.includes(cat.id))}
                     onChange={(event, newValue) => {
-                      setCategoryIds(newValue.map((cat) => cat.id));
+                      console.log("[DEBUG] New selected categories:", newValue);
+                      const updatedCategoryIds = newValue.map((cat) => cat.id);
+                      console.log("[DEBUG] Updated categoryIds:", updatedCategoryIds);
+                      setCategoryIds(updatedCategoryIds);
                     }}
                     renderInput={(params) => (
                       <TextField
@@ -754,6 +767,7 @@ const AddUpdateOffer = () => {
                       />
                     )}
                   />
+
 
                   {/* Show status dropdown only for role 2 */}
                   {roleid === '2' && (
