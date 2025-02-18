@@ -1,5 +1,5 @@
 // const baseUrl = 'http://localhost:3001/';
-const baseUrl = 'https://offertrunk.com/';
+const baseUrl = 'https://api.offertrunk.com/';
 
 const loginUrl = () => {
   return baseUrl + 'api/login';

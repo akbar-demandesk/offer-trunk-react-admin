@@ -37,7 +37,7 @@ const setSession = (accessToken, roleId) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'INIT': {
-      const { isAuthenticated  } = action.payload;
+      const { isAuthenticated } = action.payload;
 
       return {
         ...state,
@@ -80,17 +80,17 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
       });
-  
+
       if (response.data.errorCode === 0) {
         const accessToken = response.data.data.token;
         const roleId = response.data.data.role_id;
-  
+
         setSession(accessToken, roleId);
-  
+
         dispatch({
           type: 'LOGIN',
           payload: {
-            roleId
+            roleId,
           },
         });
       } else {
@@ -103,10 +103,14 @@ export const AuthProvider = ({ children }) => {
 
   const googleLogin = () => {
     return new Promise((resolve, reject) => {
-      const authWindow = window.open('https://offertrunk.com/api/auth/google', '_blank', 'width=500,height=600');
+      const authWindow = window.open(
+        'https://api.offertrunk.com/api/auth/google',
+        '_blank',
+        'width=500,height=600'
+      );
 
       const handleAuthMessage = (event) => {
-        if (event.origin !== 'https://offertrunk.com') {
+        if (event.origin !== 'https://api.offertrunk.com') {
           return;
         }
 
@@ -119,7 +123,7 @@ export const AuthProvider = ({ children }) => {
           dispatch({
             type: 'LOGIN',
             payload: {
-              roleId
+              roleId,
             },
           });
           resolve();
