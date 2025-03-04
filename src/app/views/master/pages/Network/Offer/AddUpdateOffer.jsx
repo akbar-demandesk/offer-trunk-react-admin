@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import { SimpleCard } from 'app/components';
+import React, { useEffect, useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
+import { SimpleCard } from "app/components";
 import {
   Box,
   Grid,
@@ -19,11 +19,13 @@ import {
   DialogTitle,
   TextareaAutosize,
   Autocomplete,
-} from '@mui/material';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom';
-import { Span } from 'app/components/Typography';
-import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
+  IconButton,
+} from "@mui/material";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
+import { Span } from "app/components/Typography";
+import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
+import { Helmet } from "react-helmet";
 import {
   addUpdateOffer,
   deleteOffer,
@@ -31,305 +33,324 @@ import {
   getNetworksByUser,
   getOffer,
   getCategories,
-} from 'app/helper/ApiUrlHelper';
+} from "app/helper/ApiUrlHelper";
+import {
+  Close,
+  Facebook,
+  Instagram,
+  Pinterest,
+  CheckCircleOutline,
+  CheckCircleOutlineIcon,
+  ContentCopy,
+} from "@mui/icons-material";
 
-// 1) Insert the full COUNTRY_LIST array somewhere accessible
-// You can place this array at the top of your file or in a separate file.
 const COUNTRY_LIST = [
-  { code: 'LATAM', name: 'LATAM' },
-  { code: 'APAC', name: 'APAC' },
-  { code: 'EMEA', name: 'EMEA' },
-  { code: 'International', name: 'International' },
-  { code: 'AF', name: 'Afghanistan' },
-  { code: 'AX', name: 'Åland Islands' },
-  { code: 'AL', name: 'Albania' },
-  { code: 'DZ', name: 'Algeria' },
-  { code: 'AS', name: 'American Samoa' },
-  { code: 'AD', name: 'Andorra' },
-  { code: 'AO', name: 'Angola' },
-  { code: 'AI', name: 'Anguilla' },
-  { code: 'AQ', name: 'Antarctica' },
-  { code: 'AG', name: 'Antigua and Barbuda' },
-  { code: 'AR', name: 'Argentina' },
-  { code: 'AM', name: 'Armenia' },
-  { code: 'AW', name: 'Aruba' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'AT', name: 'Austria' },
-  { code: 'AZ', name: 'Azerbaijan' },
-  { code: 'BS', name: 'Bahamas' },
-  { code: 'BH', name: 'Bahrain' },
-  { code: 'BD', name: 'Bangladesh' },
-  { code: 'BB', name: 'Barbados' },
-  { code: 'BY', name: 'Belarus' },
-  { code: 'BE', name: 'Belgium' },
-  { code: 'BZ', name: 'Belize' },
-  { code: 'BJ', name: 'Benin' },
-  { code: 'BM', name: 'Bermuda' },
-  { code: 'BT', name: 'Bhutan' },
-  { code: 'BO', name: 'Bolivia (Plurinational State of)' },
-  { code: 'BQ', name: 'Bonaire, Sint Eustatius and Saba' },
-  { code: 'BA', name: 'Bosnia and Herzegovina' },
-  { code: 'BW', name: 'Botswana' },
-  { code: 'BV', name: 'Bouvet Island' },
-  { code: 'BR', name: 'Brazil' },
-  { code: 'IO', name: 'British Indian Ocean Territory' },
-  { code: 'BN', name: 'Brunei Darussalam' },
-  { code: 'BG', name: 'Bulgaria' },
-  { code: 'BF', name: 'Burkina Faso' },
-  { code: 'BI', name: 'Burundi' },
-  { code: 'CV', name: 'Cabo Verde' },
-  { code: 'KH', name: 'Cambodia' },
-  { code: 'CM', name: 'Cameroon' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'KY', name: 'Cayman Islands' },
-  { code: 'CF', name: 'Central African Republic' },
-  { code: 'TD', name: 'Chad' },
-  { code: 'CL', name: 'Chile' },
-  { code: 'CN', name: 'China' },
-  { code: 'CX', name: 'Christmas Island' },
-  { code: 'CC', name: 'Cocos (Keeling) Islands' },
-  { code: 'CO', name: 'Colombia' },
-  { code: 'KM', name: 'Comoros' },
-  { code: 'CG', name: 'Congo' },
-  { code: 'CD', name: 'Congo (Democratic Republic of the)' },
-  { code: 'CK', name: 'Cook Islands' },
-  { code: 'CR', name: 'Costa Rica' },
-  { code: 'CI', name: "Côte d'Ivoire" },
-  { code: 'HR', name: 'Croatia' },
-  { code: 'CU', name: 'Cuba' },
-  { code: 'CW', name: 'Curaçao' },
-  { code: 'CY', name: 'Cyprus' },
-  { code: 'CZ', name: 'Czechia' },
-  { code: 'DK', name: 'Denmark' },
-  { code: 'DJ', name: 'Djibouti' },
-  { code: 'DM', name: 'Dominica' },
-  { code: 'DO', name: 'Dominican Republic' },
-  { code: 'EC', name: 'Ecuador' },
-  { code: 'EG', name: 'Egypt' },
-  { code: 'SV', name: 'El Salvador' },
-  { code: 'GQ', name: 'Equatorial Guinea' },
-  { code: 'ER', name: 'Eritrea' },
-  { code: 'EE', name: 'Estonia' },
-  { code: 'SZ', name: 'Eswatini' },
-  { code: 'ET', name: 'Ethiopia' },
-  { code: 'FK', name: 'Falkland Islands (Malvinas)' },
-  { code: 'FO', name: 'Faroe Islands' },
-  { code: 'FJ', name: 'Fiji' },
-  { code: 'FI', name: 'Finland' },
-  { code: 'FR', name: 'France' },
-  { code: 'GF', name: 'French Guiana' },
-  { code: 'PF', name: 'French Polynesia' },
-  { code: 'TF', name: 'French Southern Territories' },
-  { code: 'GA', name: 'Gabon' },
-  { code: 'GM', name: 'Gambia' },
-  { code: 'GE', name: 'Georgia' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'GH', name: 'Ghana' },
-  { code: 'GI', name: 'Gibraltar' },
-  { code: 'GR', name: 'Greece' },
-  { code: 'GL', name: 'Greenland' },
-  { code: 'GD', name: 'Grenada' },
-  { code: 'GP', name: 'Guadeloupe' },
-  { code: 'GU', name: 'Guam' },
-  { code: 'GT', name: 'Guatemala' },
-  { code: 'GG', name: 'Guernsey' },
-  { code: 'GN', name: 'Guinea' },
-  { code: 'GW', name: 'Guinea-Bissau' },
-  { code: 'GY', name: 'Guyana' },
-  { code: 'HT', name: 'Haiti' },
-  { code: 'HM', name: 'Heard Island and McDonald Islands' },
-  { code: 'VA', name: 'Holy See' },
-  { code: 'HN', name: 'Honduras' },
-  { code: 'HK', name: 'Hong Kong' },
-  { code: 'HU', name: 'Hungary' },
-  { code: 'IS', name: 'Iceland' },
-  { code: 'IN', name: 'India' },
-  { code: 'ID', name: 'Indonesia' },
-  { code: 'IR', name: 'Iran (Islamic Republic of)' },
-  { code: 'IQ', name: 'Iraq' },
-  { code: 'IE', name: 'Ireland' },
-  { code: 'IL', name: 'Israel' },
-  { code: 'IM', name: 'Isle of Man' },
-  { code: 'IT', name: 'Italy' },
-  { code: 'JM', name: 'Jamaica' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'JE', name: 'Jersey' },
-  { code: 'JO', name: 'Jordan' },
-  { code: 'KZ', name: 'Kazakhstan' },
-  { code: 'KE', name: 'Kenya' },
-  { code: 'KI', name: 'Kiribati' },
-  { code: 'KP', name: "Korea (Democratic People's Republic of)" },
-  { code: 'KR', name: 'Korea (Republic of)' },
-  { code: 'KW', name: 'Kuwait' },
-  { code: 'KG', name: 'Kyrgyzstan' },
-  { code: 'LA', name: "Lao People's Democratic Republic" },
-  { code: 'LV', name: 'Latvia' },
-  { code: 'LB', name: 'Lebanon' },
-  { code: 'LS', name: 'Lesotho' },
-  { code: 'LR', name: 'Liberia' },
-  { code: 'LY', name: 'Libya' },
-  { code: 'LI', name: 'Liechtenstein' },
-  { code: 'LT', name: 'Lithuania' },
-  { code: 'LU', name: 'Luxembourg' },
-  { code: 'MO', name: 'Macao' },
-  { code: 'MG', name: 'Madagascar' },
-  { code: 'MW', name: 'Malawi' },
-  { code: 'MY', name: 'Malaysia' },
-  { code: 'MV', name: 'Maldives' },
-  { code: 'ML', name: 'Mali' },
-  { code: 'MT', name: 'Malta' },
-  { code: 'MH', name: 'Marshall Islands' },
-  { code: 'MQ', name: 'Martinique' },
-  { code: 'MR', name: 'Mauritania' },
-  { code: 'MU', name: 'Mauritius' },
-  { code: 'YT', name: 'Mayotte' },
-  { code: 'MX', name: 'Mexico' },
-  { code: 'FM', name: 'Micronesia (Federated States of)' },
-  { code: 'MD', name: 'Moldova (Republic of)' },
-  { code: 'MC', name: 'Monaco' },
-  { code: 'MN', name: 'Mongolia' },
-  { code: 'ME', name: 'Montenegro' },
-  { code: 'MS', name: 'Montserrat' },
-  { code: 'MA', name: 'Morocco' },
-  { code: 'MZ', name: 'Mozambique' },
-  { code: 'MM', name: 'Myanmar' },
-  { code: 'NA', name: 'Namibia' },
-  { code: 'NR', name: 'Nauru' },
-  { code: 'NP', name: 'Nepal' },
-  { code: 'NL', name: 'Netherlands' },
-  { code: 'NC', name: 'New Caledonia' },
-  { code: 'NZ', name: 'New Zealand' },
-  { code: 'NI', name: 'Nicaragua' },
-  { code: 'NE', name: 'Niger' },
-  { code: 'NG', name: 'Nigeria' },
-  { code: 'NU', name: 'Niue' },
-  { code: 'NF', name: 'Norfolk Island' },
-  { code: 'MK', name: 'North Macedonia' },
-  { code: 'MP', name: 'Northern Mariana Islands' },
-  { code: 'NO', name: 'Norway' },
-  { code: 'OM', name: 'Oman' },
-  { code: 'PK', name: 'Pakistan' },
-  { code: 'PW', name: 'Palau' },
-  { code: 'PS', name: 'Palestine' },
-  { code: 'PA', name: 'Panama' },
-  { code: 'PG', name: 'Papua New Guinea' },
-  { code: 'PY', name: 'Paraguay' },
-  { code: 'PE', name: 'Peru' },
-  { code: 'PH', name: 'Philippines' },
-  { code: 'PN', name: 'Pitcairn' },
-  { code: 'PL', name: 'Poland' },
-  { code: 'PT', name: 'Portugal' },
-  { code: 'PR', name: 'Puerto Rico' },
-  { code: 'QA', name: 'Qatar' },
-  { code: 'RE', name: 'Réunion' },
-  { code: 'RO', name: 'Romania' },
-  { code: 'RU', name: 'Russian Federation' },
-  { code: 'RW', name: 'Rwanda' },
-  { code: 'BL', name: 'Saint Barthélemy' },
-  { code: 'SH', name: 'Saint Helena, Ascension and Tristan da Cunha' },
-  { code: 'KN', name: 'Saint Kitts and Nevis' },
-  { code: 'LC', name: 'Saint Lucia' },
-  { code: 'MF', name: 'Saint Martin (French part)' },
-  { code: 'PM', name: 'Saint Pierre and Miquelon' },
-  { code: 'VC', name: 'Saint Vincent and the Grenadines' },
-  { code: 'WS', name: 'Samoa' },
-  { code: 'SM', name: 'San Marino' },
-  { code: 'ST', name: 'Sao Tome and Principe' },
-  { code: 'SA', name: 'Saudi Arabia' },
-  { code: 'SN', name: 'Senegal' },
-  { code: 'RS', name: 'Serbia' },
-  { code: 'SC', name: 'Seychelles' },
-  { code: 'SL', name: 'Sierra Leone' },
-  { code: 'SG', name: 'Singapore' },
-  { code: 'SX', name: 'Sint Maarten (Dutch part)' },
-  { code: 'SK', name: 'Slovakia' },
-  { code: 'SI', name: 'Slovenia' },
-  { code: 'SB', name: 'Solomon Islands' },
-  { code: 'SO', name: 'Somalia' },
-  { code: 'ZA', name: 'South Africa' },
-  { code: 'GS', name: 'South Georgia and the South Sandwich Islands' },
-  { code: 'SS', name: 'South Sudan' },
-  { code: 'ES', name: 'Spain' },
-  { code: 'LK', name: 'Sri Lanka' },
-  { code: 'SD', name: 'Sudan' },
-  { code: 'SR', name: 'Suriname' },
-  { code: 'SJ', name: 'Svalbard and Jan Mayen' },
-  { code: 'SE', name: 'Sweden' },
-  { code: 'CH', name: 'Switzerland' },
-  { code: 'SY', name: 'Syrian Arab Republic' },
-  { code: 'TW', name: 'Taiwan' },
-  { code: 'TJ', name: 'Tajikistan' },
-  { code: 'TZ', name: 'Tanzania, United Republic of' },
-  { code: 'TH', name: 'Thailand' },
-  { code: 'TL', name: 'Timor-Leste' },
-  { code: 'TG', name: 'Togo' },
-  { code: 'TK', name: 'Tokelau' },
-  { code: 'TO', name: 'Tonga' },
-  { code: 'TT', name: 'Trinidad and Tobago' },
-  { code: 'TN', name: 'Tunisia' },
-  { code: 'TR', name: 'Turkey' },
-  { code: 'TM', name: 'Turkmenistan' },
-  { code: 'TC', name: 'Turks and Caicos Islands' },
-  { code: 'TV', name: 'Tuvalu' },
-  { code: 'UG', name: 'Uganda' },
-  { code: 'UA', name: 'Ukraine' },
-  { code: 'AE', name: 'United Arab Emirates' },
-  { code: 'GB', name: 'United Kingdom of Great Britain and Northern Ireland' },
-  { code: 'UM', name: 'United States Minor Outlying Islands' },
-  { code: 'US', name: 'United States of America' },
-  { code: 'UY', name: 'Uruguay' },
-  { code: 'UZ', name: 'Uzbekistan' },
-  { code: 'VU', name: 'Vanuatu' },
-  { code: 'VE', name: 'Venezuela (Bolivarian Republic of)' },
-  { code: 'VN', name: 'Viet Nam' },
-  { code: 'VG', name: 'Virgin Islands (British)' },
-  { code: 'VI', name: 'Virgin Islands (U.S.)' },
-  { code: 'WF', name: 'Wallis and Futuna' },
-  { code: 'EH', name: 'Western Sahara' },
-  { code: 'YE', name: 'Yemen' },
-  { code: 'ZM', name: 'Zambia' },
-  { code: 'ZW', name: 'Zimbabwe' },
+  { code: "LATAM", name: "LATAM" },
+  { code: "APAC", name: "APAC" },
+  { code: "EMEA", name: "EMEA" },
+  { code: "International", name: "International" },
+  { code: "AF", name: "Afghanistan" },
+  { code: "AX", name: "Åland Islands" },
+  { code: "AL", name: "Albania" },
+  { code: "DZ", name: "Algeria" },
+  { code: "AS", name: "American Samoa" },
+  { code: "AD", name: "Andorra" },
+  { code: "AO", name: "Angola" },
+  { code: "AI", name: "Anguilla" },
+  { code: "AQ", name: "Antarctica" },
+  { code: "AG", name: "Antigua and Barbuda" },
+  { code: "AR", name: "Argentina" },
+  { code: "AM", name: "Armenia" },
+  { code: "AW", name: "Aruba" },
+  { code: "AU", name: "Australia" },
+  { code: "AT", name: "Austria" },
+  { code: "AZ", name: "Azerbaijan" },
+  { code: "BS", name: "Bahamas" },
+  { code: "BH", name: "Bahrain" },
+  { code: "BD", name: "Bangladesh" },
+  { code: "BB", name: "Barbados" },
+  { code: "BY", name: "Belarus" },
+  { code: "BE", name: "Belgium" },
+  { code: "BZ", name: "Belize" },
+  { code: "BJ", name: "Benin" },
+  { code: "BM", name: "Bermuda" },
+  { code: "BT", name: "Bhutan" },
+  { code: "BO", name: "Bolivia (Plurinational State of)" },
+  { code: "BQ", name: "Bonaire, Sint Eustatius and Saba" },
+  { code: "BA", name: "Bosnia and Herzegovina" },
+  { code: "BW", name: "Botswana" },
+  { code: "BV", name: "Bouvet Island" },
+  { code: "BR", name: "Brazil" },
+  { code: "IO", name: "British Indian Ocean Territory" },
+  { code: "BN", name: "Brunei Darussalam" },
+  { code: "BG", name: "Bulgaria" },
+  { code: "BF", name: "Burkina Faso" },
+  { code: "BI", name: "Burundi" },
+  { code: "CV", name: "Cabo Verde" },
+  { code: "KH", name: "Cambodia" },
+  { code: "CM", name: "Cameroon" },
+  { code: "CA", name: "Canada" },
+  { code: "KY", name: "Cayman Islands" },
+  { code: "CF", name: "Central African Republic" },
+  { code: "TD", name: "Chad" },
+  { code: "CL", name: "Chile" },
+  { code: "CN", name: "China" },
+  { code: "CX", name: "Christmas Island" },
+  { code: "CC", name: "Cocos (Keeling) Islands" },
+  { code: "CO", name: "Colombia" },
+  { code: "KM", name: "Comoros" },
+  { code: "CG", name: "Congo" },
+  { code: "CD", name: "Congo (Democratic Republic of the)" },
+  { code: "CK", name: "Cook Islands" },
+  { code: "CR", name: "Costa Rica" },
+  { code: "CI", name: "Côte d'Ivoire" },
+  { code: "HR", name: "Croatia" },
+  { code: "CU", name: "Cuba" },
+  { code: "CW", name: "Curaçao" },
+  { code: "CY", name: "Cyprus" },
+  { code: "CZ", name: "Czechia" },
+  { code: "DK", name: "Denmark" },
+  { code: "DJ", name: "Djibouti" },
+  { code: "DM", name: "Dominica" },
+  { code: "DO", name: "Dominican Republic" },
+  { code: "EC", name: "Ecuador" },
+  { code: "EG", name: "Egypt" },
+  { code: "SV", name: "El Salvador" },
+  { code: "GQ", name: "Equatorial Guinea" },
+  { code: "ER", name: "Eritrea" },
+  { code: "EE", name: "Estonia" },
+  { code: "SZ", name: "Eswatini" },
+  { code: "ET", name: "Ethiopia" },
+  { code: "FK", name: "Falkland Islands (Malvinas)" },
+  { code: "FO", name: "Faroe Islands" },
+  { code: "FJ", name: "Fiji" },
+  { code: "FI", name: "Finland" },
+  { code: "FR", name: "France" },
+  { code: "GF", name: "French Guiana" },
+  { code: "PF", name: "French Polynesia" },
+  { code: "TF", name: "French Southern Territories" },
+  { code: "GA", name: "Gabon" },
+  { code: "GM", name: "Gambia" },
+  { code: "GE", name: "Georgia" },
+  { code: "DE", name: "Germany" },
+  { code: "GH", name: "Ghana" },
+  { code: "GI", name: "Gibraltar" },
+  { code: "GR", name: "Greece" },
+  { code: "GL", name: "Greenland" },
+  { code: "GD", name: "Grenada" },
+  { code: "GP", name: "Guadeloupe" },
+  { code: "GU", name: "Guam" },
+  { code: "GT", name: "Guatemala" },
+  { code: "GG", name: "Guernsey" },
+  { code: "GN", name: "Guinea" },
+  { code: "GW", name: "Guinea-Bissau" },
+  { code: "GY", name: "Guyana" },
+  { code: "HT", name: "Haiti" },
+  { code: "HM", name: "Heard Island and McDonald Islands" },
+  { code: "VA", name: "Holy See" },
+  { code: "HN", name: "Honduras" },
+  { code: "HK", name: "Hong Kong" },
+  { code: "HU", name: "Hungary" },
+  { code: "IS", name: "Iceland" },
+  { code: "IN", name: "India" },
+  { code: "ID", name: "Indonesia" },
+  { code: "IR", name: "Iran (Islamic Republic of)" },
+  { code: "IQ", name: "Iraq" },
+  { code: "IE", name: "Ireland" },
+  { code: "IL", name: "Israel" },
+  { code: "IM", name: "Isle of Man" },
+  { code: "IT", name: "Italy" },
+  { code: "JM", name: "Jamaica" },
+  { code: "JP", name: "Japan" },
+  { code: "JE", name: "Jersey" },
+  { code: "JO", name: "Jordan" },
+  { code: "KZ", name: "Kazakhstan" },
+  { code: "KE", name: "Kenya" },
+  { code: "KI", name: "Kiribati" },
+  { code: "KP", name: "Korea (Democratic People's Republic of)" },
+  { code: "KR", name: "Korea (Republic of)" },
+  { code: "KW", name: "Kuwait" },
+  { code: "KG", name: "Kyrgyzstan" },
+  { code: "LA", name: "Lao People's Democratic Republic" },
+  { code: "LV", name: "Latvia" },
+  { code: "LB", name: "Lebanon" },
+  { code: "LS", name: "Lesotho" },
+  { code: "LR", name: "Liberia" },
+  { code: "LY", name: "Libya" },
+  { code: "LI", name: "Liechtenstein" },
+  { code: "LT", name: "Lithuania" },
+  { code: "LU", name: "Luxembourg" },
+  { code: "MO", name: "Macao" },
+  { code: "MG", name: "Madagascar" },
+  { code: "MW", name: "Malawi" },
+  { code: "MY", name: "Malaysia" },
+  { code: "MV", name: "Maldives" },
+  { code: "ML", name: "Mali" },
+  { code: "MT", name: "Malta" },
+  { code: "MH", name: "Marshall Islands" },
+  { code: "MQ", name: "Martinique" },
+  { code: "MR", name: "Mauritania" },
+  { code: "MU", name: "Mauritius" },
+  { code: "YT", name: "Mayotte" },
+  { code: "MX", name: "Mexico" },
+  { code: "FM", name: "Micronesia (Federated States of)" },
+  { code: "MD", name: "Moldova (Republic of)" },
+  { code: "MC", name: "Monaco" },
+  { code: "MN", name: "Mongolia" },
+  { code: "ME", name: "Montenegro" },
+  { code: "MS", name: "Montserrat" },
+  { code: "MA", name: "Morocco" },
+  { code: "MZ", name: "Mozambique" },
+  { code: "MM", name: "Myanmar" },
+  { code: "NA", name: "Namibia" },
+  { code: "NR", name: "Nauru" },
+  { code: "NP", name: "Nepal" },
+  { code: "NL", name: "Netherlands" },
+  { code: "NC", name: "New Caledonia" },
+  { code: "NZ", name: "New Zealand" },
+  { code: "NI", name: "Nicaragua" },
+  { code: "NE", name: "Niger" },
+  { code: "NG", name: "Nigeria" },
+  { code: "NU", name: "Niue" },
+  { code: "NF", name: "Norfolk Island" },
+  { code: "MK", name: "North Macedonia" },
+  { code: "MP", name: "Northern Mariana Islands" },
+  { code: "NO", name: "Norway" },
+  { code: "OM", name: "Oman" },
+  { code: "PK", name: "Pakistan" },
+  { code: "PW", name: "Palau" },
+  { code: "PS", name: "Palestine" },
+  { code: "PA", name: "Panama" },
+  { code: "PG", name: "Papua New Guinea" },
+  { code: "PY", name: "Paraguay" },
+  { code: "PE", name: "Peru" },
+  { code: "PH", name: "Philippines" },
+  { code: "PN", name: "Pitcairn" },
+  { code: "PL", name: "Poland" },
+  { code: "PT", name: "Portugal" },
+  { code: "PR", name: "Puerto Rico" },
+  { code: "QA", name: "Qatar" },
+  { code: "RE", name: "Réunion" },
+  { code: "RO", name: "Romania" },
+  { code: "RU", name: "Russian Federation" },
+  { code: "RW", name: "Rwanda" },
+  { code: "BL", name: "Saint Barthélemy" },
+  { code: "SH", name: "Saint Helena, Ascension and Tristan da Cunha" },
+  { code: "KN", name: "Saint Kitts and Nevis" },
+  { code: "LC", name: "Saint Lucia" },
+  { code: "MF", name: "Saint Martin (French part)" },
+  { code: "PM", name: "Saint Pierre and Miquelon" },
+  { code: "VC", name: "Saint Vincent and the Grenadines" },
+  { code: "WS", name: "Samoa" },
+  { code: "SM", name: "San Marino" },
+  { code: "ST", name: "Sao Tome and Principe" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "SN", name: "Senegal" },
+  { code: "RS", name: "Serbia" },
+  { code: "SC", name: "Seychelles" },
+  { code: "SL", name: "Sierra Leone" },
+  { code: "SG", name: "Singapore" },
+  { code: "SX", name: "Sint Maarten (Dutch part)" },
+  { code: "SK", name: "Slovakia" },
+  { code: "SI", name: "Slovenia" },
+  { code: "SB", name: "Solomon Islands" },
+  { code: "SO", name: "Somalia" },
+  { code: "ZA", name: "South Africa" },
+  { code: "GS", name: "South Georgia and the South Sandwich Islands" },
+  { code: "SS", name: "South Sudan" },
+  { code: "ES", name: "Spain" },
+  { code: "LK", name: "Sri Lanka" },
+  { code: "SD", name: "Sudan" },
+  { code: "SR", name: "Suriname" },
+  { code: "SJ", name: "Svalbard and Jan Mayen" },
+  { code: "SE", name: "Sweden" },
+  { code: "CH", name: "Switzerland" },
+  { code: "SY", name: "Syrian Arab Republic" },
+  { code: "TW", name: "Taiwan" },
+  { code: "TJ", name: "Tajikistan" },
+  { code: "TZ", name: "Tanzania, United Republic of" },
+  { code: "TH", name: "Thailand" },
+  { code: "TL", name: "Timor-Leste" },
+  { code: "TG", name: "Togo" },
+  { code: "TK", name: "Tokelau" },
+  { code: "TO", name: "Tonga" },
+  { code: "TT", name: "Trinidad and Tobago" },
+  { code: "TN", name: "Tunisia" },
+  { code: "TR", name: "Turkey" },
+  { code: "TM", name: "Turkmenistan" },
+  { code: "TC", name: "Turks and Caicos Islands" },
+  { code: "TV", name: "Tuvalu" },
+  { code: "UG", name: "Uganda" },
+  { code: "UA", name: "Ukraine" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "GB", name: "United Kingdom of Great Britain and Northern Ireland" },
+  { code: "UM", name: "United States Minor Outlying Islands" },
+  { code: "US", name: "United States of America" },
+  { code: "UY", name: "Uruguay" },
+  { code: "UZ", name: "Uzbekistan" },
+  { code: "VU", name: "Vanuatu" },
+  { code: "VE", name: "Venezuela (Bolivarian Republic of)" },
+  { code: "VN", name: "Viet Nam" },
+  { code: "VG", name: "Virgin Islands (British)" },
+  { code: "VI", name: "Virgin Islands (U.S.)" },
+  { code: "WF", name: "Wallis and Futuna" },
+  { code: "EH", name: "Western Sahara" },
+  { code: "YE", name: "Yemen" },
+  { code: "ZM", name: "Zambia" },
+  { code: "ZW", name: "Zimbabwe" },
 ];
 
-const Container = styled('div')(({ theme }) => ({
-  margin: '30px',
-  [theme.breakpoints.down('sm')]: { margin: '16px' },
-  '& .breadcrumb': {
-    marginBottom: '30px',
-    [theme.breakpoints.down('sm')]: { marginBottom: '16px' },
+const Container = styled("div")(({ theme }) => ({
+  margin: "30px",
+  [theme.breakpoints.down("sm")]: { margin: "16px" },
+  "& .breadcrumb": {
+    marginBottom: "30px",
+    [theme.breakpoints.down("sm")]: { marginBottom: "16px" },
   },
 }));
 
 const TextField = styled(TextValidator)(({ theme, readOnly }) => ({
-  width: '100%',
-  marginBottom: '16px',
+  width: "100%",
+  marginBottom: "16px",
   ...(readOnly && {
     backgroundColor: theme.palette.action.disabledBackground,
   }),
 }));
 
 const statusOptions = [
-  { label: 'Unapproved', value: 0 },
-  { label: 'Approved', value: 1 },
-  { label: 'Rejected', value: 2 },
+  { label: "Unapproved", value: 0 },
+  { label: "Approved", value: 1 },
+  { label: "Rejected", value: 2 },
 ];
 
 // NEW: Payout type options
 const payoutTypeOptions = [
-  { label: 'flat', value: 'flat' },
-  { label: 'percentage', value: 'percentage' },
+  { label: "flat", value: "flat" },
+  { label: "percentage", value: "percentage" },
 ];
 
 // NEW: Tracking type options
 const trackingTypeOptions = [
-  { label: 'online', value: 'online' },
-  { label: 'offline', value: 'offline' },
+  { label: "online", value: "online" },
+  { label: "offline", value: "offline" },
 ];
+
+const slugify = (text) =>
+  text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
 const AddUpdateOffer = () => {
   let location = useLocation();
   let id = location?.state?.data || 0;
-  let roleid = localStorage.getItem('roleId');
+  let roleid = localStorage.getItem("roleId");
+  const [slug, setSlug] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const [state, setState] = useState({ id: id });
   const [editImage, setEditImage] = useState(false);
@@ -350,8 +371,9 @@ const AddUpdateOffer = () => {
   // Dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
-  const [remarks, setRemarks] = useState('');
+  const [remarks, setRemarks] = useState("");
   const [remarksError, setRemarksError] = useState(false);
+  const [openShareModal, setOpenShareModal] = useState(false);
 
   const theme = useTheme();
 
@@ -359,12 +381,13 @@ const AddUpdateOffer = () => {
     setLoading(true);
 
     // 1) Fetch Networks
-    const fetchNetworks = roleid !== '2' ? getNetworksByUser() : getAllNetworks();
+    const fetchNetworks =
+      roleid !== "2" ? getNetworksByUser() : getAllNetworks();
     axios({
-      method: 'post',
+      method: "post",
       headers: {
-        token: localStorage.getItem('accessToken'),
-        roleid: localStorage.getItem('roleId'),
+        token: localStorage.getItem("accessToken"),
+        roleid: localStorage.getItem("roleId"),
       },
       url: fetchNetworks,
       data: {},
@@ -374,24 +397,28 @@ const AddUpdateOffer = () => {
           setNetworks(response.data.data);
         } else {
           const message = response.data.message;
-          if (['Invalid Token 1', 'Invalid Token 2', 'Invalid Token 3'].includes(message)) {
-            alert('Session Expired, please relogin');
-            window.location.href = '/session/signin';
+          if (
+            ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
+              message
+            )
+          ) {
+            alert("Session Expired, please relogin");
+            window.location.href = "/session/signin";
           } else {
             alert(message);
           }
         }
       })
       .catch((error) => {
-        console.error('Error fetching networks:', error);
+        console.error("Error fetching networks:", error);
       });
 
     // 2) Fetch Categories
     axios({
-      method: 'post',
+      method: "post",
       headers: {
-        token: localStorage.getItem('accessToken'),
-        roleid: localStorage.getItem('roleId'),
+        token: localStorage.getItem("accessToken"),
+        roleid: localStorage.getItem("roleId"),
       },
       url: getCategories(),
       data: {},
@@ -401,25 +428,29 @@ const AddUpdateOffer = () => {
           setAllCategories(res.data.data);
         } else {
           const message = res.data.message;
-          if (['Invalid Token 1', 'Invalid Token 2', 'Invalid Token 3'].includes(message)) {
-            alert('Session Expired, please relogin');
-            window.location.href = '/session/signin';
+          if (
+            ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
+              message
+            )
+          ) {
+            alert("Session Expired, please relogin");
+            window.location.href = "/session/signin";
           } else {
             alert(message);
           }
         }
       })
       .catch((error) => {
-        console.error('Error fetching categories:', error);
+        console.error("Error fetching categories:", error);
       });
 
     // 3) If editing an existing offer, fetch its details
     if (id) {
       axios({
-        method: 'post',
+        method: "post",
         headers: {
-          token: localStorage.getItem('accessToken'),
-          roleid: localStorage.getItem('roleId'),
+          token: localStorage.getItem("accessToken"),
+          roleid: localStorage.getItem("roleId"),
         },
         url: getOffer(),
         data: { id: id },
@@ -432,24 +463,33 @@ const AddUpdateOffer = () => {
             setStatus(offerData.status || 0);
 
             // Convert "4,5" into [4, 5]
-            if (offerData.category_ids && typeof offerData.category_ids === 'string') {
+            if (
+              offerData.category_ids &&
+              typeof offerData.category_ids === "string"
+            ) {
               const catArray = offerData.category_ids
-                .split(',')
+                .split(",")
                 .map((str) => Number(str.trim()))
                 .filter((num) => !isNaN(num));
               setCategoryIds(catArray);
             }
 
             // Convert "AF,AL" into ["AF", "AL"]
-            if (offerData.geo && typeof offerData.geo === 'string') {
-              const geoArray = offerData.geo.split(',').map((c) => c.trim());
+            if (offerData.geo && typeof offerData.geo === "string") {
+              const geoArray = offerData.geo.split(",").map((c) => c.trim());
               setSelectedCountries(geoArray);
             }
           } else {
             const message = response.data.message;
-            if (['Invalid Token 1', 'Invalid Token 2', 'Invalid Token 3'].includes(message)) {
-              alert('Session Expired, please relogin');
-              window.location.href = '/session/signin';
+            if (
+              [
+                "Invalid Token 1",
+                "Invalid Token 2",
+                "Invalid Token 3",
+              ].includes(message)
+            ) {
+              alert("Session Expired, please relogin");
+              window.location.href = "/session/signin";
             } else {
               alert(message);
             }
@@ -457,7 +497,7 @@ const AddUpdateOffer = () => {
         })
         .catch((error) => {
           setLoading(false);
-          console.error('Error fetching offer:', error);
+          console.error("Error fetching offer:", error);
         });
     } else {
       // If not editing an offer, just stop the loader
@@ -471,7 +511,9 @@ const AddUpdateOffer = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    let choice = window.confirm('Are you sure you want to add/update this offer?');
+    let choice = window.confirm(
+      "Are you sure you want to add/update this offer?"
+    );
     if (!choice) return;
 
     setLoading(true);
@@ -479,6 +521,8 @@ const AddUpdateOffer = () => {
     // alert(JSON.stringify(state));
 
     const { category_ids, ...rest } = state;
+    const generatedSlug = slugify(name);
+    setSlug(generatedSlug);
 
     const formData = new FormData();
     for (const key in rest) {
@@ -486,23 +530,23 @@ const AddUpdateOffer = () => {
     }
 
     // Status
-    formData.set('status', status);
+    formData.set("status", status);
 
     categoryIds.forEach((catId) => {
-      formData.append('category_ids[]', Number(catId));
+      formData.append("category_ids[]", Number(catId));
     });
 
     // Countries as JSON string (e.g. ["US","GB","IN"])
-    formData.set('geo', JSON.stringify(selectedCountries));
+    formData.set("geo", JSON.stringify(selectedCountries));
 
     // console.log('[DEBUG] Final categoryIds to be sent:', categoryIds);
     // console.log('[DEBUG] formData category_ids:', formData.getAll('category_ids[]'));
 
     axios({
-      method: 'post',
+      method: "post",
       headers: {
-        token: localStorage.getItem('accessToken'),
-        roleid: localStorage.getItem('roleId'),
+        token: localStorage.getItem("accessToken"),
+        roleid: localStorage.getItem("roleId"),
       },
       url: addUpdateOffer(),
       data: formData,
@@ -512,12 +556,17 @@ const AddUpdateOffer = () => {
         if (response.data.errorCode === 0) {
           alert(response.data.message);
           // Redirect based on role
-          window.location.href = roleid !== '2' ? '/network' : '/offer';
+          // window.location.href = roleid !== "2" ? "/network" : "/offer";
+          setOpenShareModal(true);
         } else {
           const message = response.data.message;
-          if (['Invalid Token 1', 'Invalid Token 2', 'Invalid Token 3'].includes(message)) {
-            alert('Session Expired, please relogin');
-            window.location.href = '/session/signin';
+          if (
+            ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
+              message
+            )
+          ) {
+            alert("Session Expired, please relogin");
+            window.location.href = "/session/signin";
           } else {
             alert(message);
           }
@@ -525,8 +574,8 @@ const AddUpdateOffer = () => {
       })
       .catch((err) => {
         setLoading(false);
-        console.error('Error adding/updating offer:', err);
-        alert('An error occurred while saving the offer.');
+        console.error("Error adding/updating offer:", err);
+        alert("An error occurred while saving the offer.");
       });
   };
 
@@ -534,7 +583,7 @@ const AddUpdateOffer = () => {
   // Delete Handlers
   // --------------------------------------------------------------------
   const handleDelete = () => {
-    if (roleid === '2') {
+    if (roleid === "2") {
       setDeleteDialogOpen(true);
     } else {
       setConfirmationDialogOpen(true);
@@ -549,10 +598,10 @@ const AddUpdateOffer = () => {
   const deleteOfferRequest = (remarks) => {
     setLoading(true);
     axios({
-      method: 'post',
+      method: "post",
       headers: {
-        token: localStorage.getItem('accessToken'),
-        roleid: localStorage.getItem('roleId'),
+        token: localStorage.getItem("accessToken"),
+        roleid: localStorage.getItem("roleId"),
       },
       url: deleteOffer(),
       data: { id: id, remarks: remarks },
@@ -561,12 +610,16 @@ const AddUpdateOffer = () => {
         setLoading(false);
         if (response.data.errorCode === 0) {
           alert(response.data.message);
-          window.location.href = roleid !== '2' ? '/network' : '/offer';
+          window.location.href = roleid !== "2" ? "/network" : "/offer";
         } else {
           const message = response.data.message;
-          if (['Invalid Token 1', 'Invalid Token 2', 'Invalid Token 3'].includes(message)) {
-            alert('Session Expired, please relogin');
-            window.location.href = '/session/signin';
+          if (
+            ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
+              message
+            )
+          ) {
+            alert("Session Expired, please relogin");
+            window.location.href = "/session/signin";
           } else {
             alert(message);
           }
@@ -574,8 +627,8 @@ const AddUpdateOffer = () => {
       })
       .catch((err) => {
         setLoading(false);
-        console.error('Error deleting offer:', err);
-        alert('An error occurred while deleting the offer.');
+        console.error("Error deleting offer:", err);
+        alert("An error occurred while deleting the offer.");
       });
   };
 
@@ -583,10 +636,9 @@ const AddUpdateOffer = () => {
   // Form Field Change Handlers
   // --------------------------------------------------------------------
   const handleChange = (event) => {
-    const { name, value } = event.target
-    setState((prev) => ({ ...prev, [name]: value }))
-  }
-
+    const { name, value } = event.target;
+    setState((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleNetworkChange = (value) => {
     setState((prev) => ({ ...prev, network_id: value }));
@@ -602,15 +654,15 @@ const AddUpdateOffer = () => {
   const imageUpload = (event) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
-      const allowedExtensions = ['jpg', 'jpeg', 'png'];
+      const fileExtension = selectedFile.name.split(".").pop().toLowerCase();
+      const allowedExtensions = ["jpg", "jpeg", "png"];
       if (allowedExtensions.includes(fileExtension)) {
         setState((prev) => ({ ...prev, img: selectedFile }));
       } else {
-        alert('Please select a valid image file (jpg, jpeg, png)');
+        alert("Please select a valid image file (jpg, jpeg, png)");
       }
     } else {
-      alert('Please select a file');
+      alert("Please select a file");
     }
   };
 
@@ -623,7 +675,7 @@ const AddUpdateOffer = () => {
   // --------------------------------------------------------------------
   const handleDeleteDialogClose = (confirm) => {
     if (confirm) {
-      if (!remarks || remarks.trim() === '') {
+      if (!remarks || remarks.trim() === "") {
         setRemarksError(true);
       } else {
         setRemarksError(false);
@@ -633,6 +685,12 @@ const AddUpdateOffer = () => {
     } else {
       setDeleteDialogOpen(false);
     }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(`${window.location.origin}/offer/${slug}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   // --------------------------------------------------------------------
@@ -649,11 +707,60 @@ const AddUpdateOffer = () => {
     tracking_type,
   } = state;
 
+  const shareUrl = `${window.location.origin}/offer/${slug}`;
+  const imageUrl =
+    typeof state.img === "string"
+      ? state.img
+      : "https://offertrunk.com/default-image.jpg";
+
+  const offerUrl = `${window.location.origin}/offer/${slug}`;
+  const offerName = state.name || "Special Offer!";
+  const offerDesc = state.description || "Check out this amazing deal.";
+  const offerImage = state.img || "https://yourwebsite.com/default-image.jpg";
+
+  const shareOnPinterest = () => {
+    const offerUrl = `${window.location.origin}/offer/${slug}`;
+    const imageUrl = state.img || "https://offertrunk.com/default-image.jpg";
+    const description = state.description || "Check out this amazing offer!";
+
+    window.open(
+      `https://in.pinterest.com/pin-builder/?description=${encodeURIComponent(
+        description
+      )}&media=${encodeURIComponent(imageUrl)}&url=${encodeURIComponent(
+        offerUrl
+      )}`,
+      "_blank"
+    );
+  };
+
+  const shareOnFacebook = () => {
+    const offerUrl = `${window.location.origin}/offer/${slug}`;
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        offerUrl
+      )}`,
+      "_blank"
+    );
+  };
+
   return (
     <>
+      <Helmet>
+        <title>{offerName}</title>
+        <meta property="og:title" content={offerName} />
+        <meta property="og:description" content={offerDesc} />
+        <meta property="og:image" content={offerImage} />
+        <meta property="og:url" content={offerUrl} />
+        <meta property="og:type" content="website" />
+      </Helmet>
       {loading ? (
         <Box
-          sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+          }}
         >
           <CircularProgress />
           <br />
@@ -673,7 +780,9 @@ const AddUpdateOffer = () => {
                     options={networks || []}
                     value={
                       networks?.length
-                        ? networks.find((network) => network.id === state.network_id) || null
+                        ? networks.find(
+                            (network) => network.id === state.network_id
+                          ) || null
                         : null
                     }
                     getOptionLabel={(option) => option.name}
@@ -700,9 +809,9 @@ const AddUpdateOffer = () => {
                     name="name"
                     label="Name"
                     onChange={handleChange}
-                    value={name || ''}
-                    validators={['required']}
-                    errorMessages={['this field is required']}
+                    value={name || ""}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
                   />
 
                   {/* Description */}
@@ -711,9 +820,9 @@ const AddUpdateOffer = () => {
                     name="description"
                     label="Description"
                     onChange={handleChange}
-                    value={description || ''}
-                    validators={['required']}
-                    errorMessages={['this field is required']}
+                    value={description || ""}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
                   />
 
                   {/* Payout */}
@@ -722,16 +831,16 @@ const AddUpdateOffer = () => {
                     name="payout"
                     label="Payout"
                     onChange={handleChange}
-                    value={payout || ''}
-                    validators={['required']}
-                    errorMessages={['this field is required']}
+                    value={payout || ""}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
                   />
 
                   {/* Payout Type (Select) */}
                   <FormControl fullWidth sx={{ mb: 2 }}>
                     <Select
                       name="payout_type"
-                      value={payout_type || ''}
+                      value={payout_type || ""}
                       onChange={handleChange}
                       displayEmpty
                     >
@@ -750,11 +859,16 @@ const AddUpdateOffer = () => {
                     id="categories-select"
                     options={allCategories}
                     getOptionLabel={(option) => option.name}
-                    value={allCategories.filter((cat) => categoryIds.includes(cat.id))}
+                    value={allCategories.filter((cat) =>
+                      categoryIds.includes(cat.id)
+                    )}
                     onChange={(event, newValue) => {
                       console.log("[DEBUG] New selected categories:", newValue);
                       const updatedCategoryIds = newValue.map((cat) => cat.id);
-                      console.log("[DEBUG] Updated categoryIds:", updatedCategoryIds);
+                      console.log(
+                        "[DEBUG] Updated categoryIds:",
+                        updatedCategoryIds
+                      );
                       setCategoryIds(updatedCategoryIds);
                     }}
                     renderInput={(params) => (
@@ -768,11 +882,14 @@ const AddUpdateOffer = () => {
                     )}
                   />
 
-
                   {/* Show status dropdown only for role 2 */}
-                  {roleid === '2' && (
+                  {roleid === "2" && (
                     <FormControl fullWidth sx={{ mb: 2 }}>
-                      <Select value={status} onChange={handleStatusChange} displayEmpty>
+                      <Select
+                        value={status}
+                        onChange={handleStatusChange}
+                        displayEmpty
+                      >
                         <MenuItem value="">Select Status</MenuItem>
                         {statusOptions.map((option) => (
                           <MenuItem key={option.value} value={option.value}>
@@ -787,14 +904,24 @@ const AddUpdateOffer = () => {
                   {!id ? (
                     <>
                       <label>Offer Image (50x50): </label>
-                      <TextField type="file" name="img" onChange={imageUpload} />
+                      <TextField
+                        type="file"
+                        name="img"
+                        onChange={imageUpload}
+                      />
                     </>
                   ) : (
                     !editImage && (
                       <>
-                        <Button color="warning" variant="contained" onClick={handleImageChange}>
+                        <Button
+                          color="warning"
+                          variant="contained"
+                          onClick={handleImageChange}
+                        >
                           <Icon>edit</Icon>
-                          <Span sx={{ pl: 1, textTransform: 'capitalize' }}>Update Image</Span>
+                          <Span sx={{ pl: 1, textTransform: "capitalize" }}>
+                            Update Image
+                          </Span>
                         </Button>
                         <br />
                         <br />
@@ -806,7 +933,11 @@ const AddUpdateOffer = () => {
                   {editImage && (
                     <>
                       <label>Offer Image (50x50): </label>
-                      <TextField type="file" name="img" onChange={imageUpload} />
+                      <TextField
+                        type="file"
+                        name="img"
+                        onChange={imageUpload}
+                      />
                     </>
                   )}
                 </Grid>
@@ -815,23 +946,22 @@ const AddUpdateOffer = () => {
                     RIGHT COLUMN
                 -------------------------------------- */}
                 <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-
                   {/* Offer Link */}
                   <TextField
                     type="text"
                     name="offer_link"
                     label="Offer Link"
-                    value={offer_link || ''}
+                    value={offer_link || ""}
                     onChange={handleChange}
-                    validators={['required']}
-                    errorMessages={['this field is required']}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
                   />
 
                   {/* Tracking Type (Select) */}
                   <FormControl fullWidth sx={{ mb: 2 }}>
                     <Select
                       name="tracking_type"
-                      value={tracking_type || ''}
+                      value={tracking_type || ""}
                       onChange={handleChange}
                       displayEmpty
                     >
@@ -851,7 +981,9 @@ const AddUpdateOffer = () => {
                     options={COUNTRY_LIST}
                     getOptionLabel={(option) => option.name}
                     // Convert selected country codes to actual country objects
-                    value={COUNTRY_LIST.filter((c) => selectedCountries.includes(c.code))}
+                    value={COUNTRY_LIST.filter((c) =>
+                      selectedCountries.includes(c.code)
+                    )}
                     onChange={(event, newValue) => {
                       setSelectedCountries(newValue.map((item) => item.code));
                     }}
@@ -867,9 +999,16 @@ const AddUpdateOffer = () => {
                   />
 
                   {/* Save Button */}
-                  <Button color="success" variant="contained" type="submit" sx={{ mt: 2 }}>
+                  <Button
+                    color="success"
+                    variant="contained"
+                    type="submit"
+                    sx={{ mt: 2 }}
+                  >
                     <Icon>send</Icon>
-                    <Span sx={{ pl: 1, textTransform: 'capitalize' }}>Save</Span>
+                    <Span sx={{ pl: 1, textTransform: "capitalize" }}>
+                      Save
+                    </Span>
                   </Button>
 
                   {/* Delete Button (only if existing offer) */}
@@ -881,7 +1020,9 @@ const AddUpdateOffer = () => {
                       sx={{ mt: 2, ml: 2 }}
                     >
                       <Icon>delete</Icon>
-                      <Span sx={{ pl: 1, textTransform: 'capitalize' }}>Delete</Span>
+                      <Span sx={{ pl: 1, textTransform: "capitalize" }}>
+                        Delete
+                      </Span>
                     </Button>
                   )}
                 </Grid>
@@ -901,13 +1042,14 @@ const AddUpdateOffer = () => {
             <DialogTitle id="delete-dialog-title">Delete Offer</DialogTitle>
             <DialogContent>
               <DialogContentText id="delete-dialog-description">
-                Are you sure you want to delete this offer? Please provide remarks if any.
+                Are you sure you want to delete this offer? Please provide
+                remarks if any.
               </DialogContentText>
               <TextareaAutosize
                 aria-label="Remarks"
                 minRows={3}
                 placeholder="Remarks"
-                style={{ width: '100%', marginTop: '10px' }}
+                style={{ width: "100%", marginTop: "10px" }}
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
               />
@@ -918,10 +1060,17 @@ const AddUpdateOffer = () => {
               )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => handleDeleteDialogClose(false)} color="primary">
+              <Button
+                onClick={() => handleDeleteDialogClose(false)}
+                color="primary"
+              >
                 Cancel
               </Button>
-              <Button onClick={() => handleDeleteDialogClose(true)} color="error" autoFocus>
+              <Button
+                onClick={() => handleDeleteDialogClose(true)}
+                color="error"
+                autoFocus
+              >
                 Delete
               </Button>
             </DialogActions>
@@ -936,18 +1085,157 @@ const AddUpdateOffer = () => {
             aria-labelledby="confirmation-dialog-title"
             aria-describedby="confirmation-dialog-description"
           >
-            <DialogTitle id="confirmation-dialog-title">Confirm Deletion</DialogTitle>
+            <DialogTitle id="confirmation-dialog-title">
+              Confirm Deletion
+            </DialogTitle>
             <DialogContent>
               <DialogContentText id="confirmation-dialog-description">
                 Are you sure you want to delete this offer?
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setConfirmationDialogOpen(false)} color="primary">
+              <Button
+                onClick={() => setConfirmationDialogOpen(false)}
+                color="primary"
+              >
                 Cancel
               </Button>
               <Button onClick={confirmDelete} color="error" autoFocus>
                 Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            open={openShareModal}
+            onClose={() => setOpenShareModal(false)}
+            maxWidth="xs"
+            fullWidth
+          >
+            <Box
+              sx={{
+                background: "linear-gradient(135deg, #4CAF50 0%, #2e7d32 100%)",
+                padding: "2rem",
+                color: "#fff",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                position: "relative",
+              }}
+            >
+              <IconButton
+                onClick={() => setOpenShareModal(false)}
+                sx={{
+                  position: "absolute",
+                  right: "1rem",
+                  top: "1rem",
+                  color: "#fff",
+                }}
+              >
+                <Close />
+              </IconButton>
+
+              <CheckCircleOutline sx={{ fontSize: "60px", mb: 1 }} />
+
+              <DialogTitle
+                sx={{
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  margin: 0,
+                  padding: 0,
+                }}
+              >
+                Offer Saved Successfully!
+              </DialogTitle>
+            </Box>
+
+            <DialogContent sx={{ padding: "1.5rem 2rem", textAlign: "center" }}>
+              <Typography variant="body1" sx={{ mb: 2, color: "#555" }}>
+                Share your offer using the link below:
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "10px",
+                  border: "1px solid #ddd",
+                  borderRadius: "10px",
+                  padding: "10px",
+                  backgroundColor: "#f9f9f9",
+                }}
+              >
+                <Typography variant="body2">{`${window.location.origin}/offer/${slug}`}</Typography>
+                <IconButton onClick={handleCopy}>
+                  <ContentCopy />
+                </IconButton>
+              </Box>
+              {copied && (
+                <Typography sx={{ mt: 1, color: "green" }}>Copied!</Typography>
+              )}
+
+              <Typography variant="body1" sx={{ mt: 3, mb: 2, color: "#555" }}>
+                Would you like to share your offer?
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: "20px",
+                  mb: 3,
+                }}
+              >
+                <IconButton
+                  sx={{
+                    backgroundColor: "#1877f2",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#0d6efd" },
+                  }}
+                  onClick={shareOnFacebook}
+                >
+                  <Facebook fontSize="large" />
+                </IconButton>
+
+                <IconButton
+                  sx={{
+                    backgroundColor: "#E1306C",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#C13584" },
+                  }}
+                  onClick={() =>
+                    alert(
+                      "Instagram sharing is not supported via direct links. Copy and share manually."
+                    )
+                  }
+                >
+                  <Instagram fontSize="large" />
+                </IconButton>
+
+                <IconButton
+                  sx={{
+                    backgroundColor: "#e60023",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#bd081c" },
+                  }}
+                  onClick={shareOnPinterest}
+                >
+                  <Pinterest fontSize="large" />
+                </IconButton>
+              </Box>
+            </DialogContent>
+
+            <DialogActions
+              sx={{ justifyContent: "center", paddingBottom: "2rem" }}
+            >
+              <Button
+                variant="contained"
+                sx={{ background: "#4CAF50", color: "white" }}
+                onClick={() => (window.location.href = "/offer")}
+              >
+                Continue →
               </Button>
             </DialogActions>
           </Dialog>
