@@ -719,8 +719,12 @@ const AddUpdateOffer = () => {
   const offerImage = state.img || "https://yourwebsite.com/default-image.jpg";
 
   const shareOnPinterest = () => {
+    const slug = state.slug || "default-slug"; // Ensure slug exists
     const offerUrl = `${window.location.origin}/offer/${slug}`;
-    const imageUrl = state.img || "https://offertrunk.com/default-image.jpg";
+    const imageUrl =
+      state.img && typeof state.img === "string" && state.img.startsWith("http")
+        ? state.img
+        : "https://offertrunk.com/default-image.jpg";
     const description = state.description || "Check out this amazing offer!";
 
     window.open(
@@ -746,11 +750,19 @@ const AddUpdateOffer = () => {
   return (
     <>
       <Helmet>
-        <title>{offerName}</title>
-        <meta property="og:title" content={offerName} />
-        <meta property="og:description" content={offerDesc} />
-        <meta property="og:image" content={offerImage} />
-        <meta property="og:url" content={offerUrl} />
+        <meta property="og:title" content="Amazing Offer - 50% Off!" />
+        <meta
+          property="og:description"
+          content="Don't miss this amazing deal. Limited time only!"
+        />
+        <meta
+          property="og:image"
+          content="https://offer-trunk-react-admin-8g23.vercel.app/images/offer.jpg"
+        />
+        <meta
+          property="og:url"
+          content="https://offer-trunk-react-admin-8g23.vercel.app/offer/shaikh-akbar"
+        />
         <meta property="og:type" content="website" />
       </Helmet>
       {loading ? (
