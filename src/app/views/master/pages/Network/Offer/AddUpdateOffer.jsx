@@ -335,15 +335,25 @@ const trackingTypeOptions = [
   { label: "offline", value: "offline" },
 ];
 
+// const slugify = (text) =>
+//   text
+//     .toString()
+//     .toLowerCase()
+//     .trim()
+//     .replace(/\s+/g, "-")
+//     .replace(/[^\w-]+/g, "")
+//     .replace(/--+/g, "-")
+//     .replace(/^-+|-+$/g, "");
 const slugify = (text) =>
   text
     .toString()
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
-    .replace(/--+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\w-]+/g, "") // Remove special chars
+// .replace(/--+/g, "-") // Replace multiple - with single -
+// .replace(/^-+|-+$/g, ""); // Trim - from start & end
+
 
 const AddUpdateOffer = () => {
   let location = useLocation();
@@ -374,15 +384,145 @@ const AddUpdateOffer = () => {
   const [remarks, setRemarks] = useState("");
   const [remarksError, setRemarksError] = useState(false);
   const [openShareModal, setOpenShareModal] = useState(false);
+  const [slugEdited, setSlugEdited] = useState(false);
+
 
   const theme = useTheme();
+
+  // useEffect(() => {
+  //   setLoading(true);
+
+  //   // 1) Fetch Networks
+  //   const fetchNetworks =
+  //     roleid !== "2" ? getNetworksByUser() : getAllNetworks();
+  //   axios({
+  //     method: "post",
+  //     headers: {
+  //       token: localStorage.getItem("accessToken"),
+  //       roleid: localStorage.getItem("roleId"),
+  //     },
+  //     url: fetchNetworks,
+  //     data: {},
+  //   })
+  //     .then((response) => {
+  //       if (response.data.errorCode === 0) {
+  //         setNetworks(response.data.data);
+  //       } else {
+  //         const message = response.data.message;
+  //         if (
+  //           ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
+  //             message
+  //           )
+  //         ) {
+  //           alert("Session Expired, please relogin");
+  //           window.location.href = "/session/signin";
+  //         } else {
+  //           alert(message);
+  //         }
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching networks:", error);
+  //     });
+
+  //   // 2) Fetch Categories
+  //   axios({
+  //     method: "post",
+  //     headers: {
+  //       token: localStorage.getItem("accessToken"),
+  //       roleid: localStorage.getItem("roleId"),
+  //     },
+  //     url: getCategories(),
+  //     data: {},
+  //   })
+  //     .then((res) => {
+  //       if (res.data.errorCode === 0) {
+  //         setAllCategories(res.data.data);
+  //       } else {
+  //         const message = res.data.message;
+  //         if (
+  //           ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
+  //             message
+  //           )
+  //         ) {
+  //           alert("Session Expired, please relogin");
+  //           window.location.href = "/session/signin";
+  //         } else {
+  //           alert(message);
+  //         }
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching categories:", error);
+  //     });
+
+  //   // 3) If editing an existing offer, fetch its details
+  //   if (id) {
+  //     axios({
+  //       method: "post",
+  //       headers: {
+  //         token: localStorage.getItem("accessToken"),
+  //         roleid: localStorage.getItem("roleId"),
+  //       },
+  //       url: getOffer(),
+  //       data: { id: id },
+  //     })
+  //       .then((response) => {
+  //         setLoading(false);
+  //         if (response.data.errorCode === 0) {
+  //           const offerData = response.data.data;
+  //           setState(offerData);
+  //           setStatus(offerData.status || 0);
+
+  //           // Convert "4,5" into [4, 5]
+  //           if (
+  //             offerData.category_ids &&
+  //             typeof offerData.category_ids === "string"
+  //           ) {
+  //             const catArray = offerData.category_ids
+  //               .split(",")
+  //               .map((str) => Number(str.trim()))
+  //               .filter((num) => !isNaN(num));
+  //             setCategoryIds(catArray);
+  //           }
+
+  //           // Convert "AF,AL" into ["AF", "AL"]
+  //           if (offerData.geo && typeof offerData.geo === "string") {
+  //             const geoArray = offerData.geo.split(",").map((c) => c.trim());
+  //             setSelectedCountries(geoArray);
+  //           }
+  //         } else {
+  //           const message = response.data.message;
+  //           if (
+  //             [
+  //               "Invalid Token 1",
+  //               "Invalid Token 2",
+  //               "Invalid Token 3",
+  //             ].includes(message)
+  //           ) {
+  //             alert("Session Expired, please relogin");
+  //             window.location.href = "/session/signin";
+  //           } else {
+  //             alert(message);
+  //           }
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         setLoading(false);
+  //         console.error("Error fetching offer:", error);
+  //       });
+  //   } else {
+  //     // If not editing an offer, just stop the loader
+  //     setLoading(false);
+  //   }
+  // }, [id, roleid, location?.state?.data]);
+
 
   useEffect(() => {
     setLoading(true);
 
     // 1) Fetch Networks
-    const fetchNetworks =
-      roleid !== "2" ? getNetworksByUser() : getAllNetworks();
+    const fetchNetworks = roleid !== "2" ? getNetworksByUser() : getAllNetworks();
     axios({
       method: "post",
       headers: {
@@ -397,11 +537,7 @@ const AddUpdateOffer = () => {
           setNetworks(response.data.data);
         } else {
           const message = response.data.message;
-          if (
-            ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
-              message
-            )
-          ) {
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
             alert("Session Expired, please relogin");
             window.location.href = "/session/signin";
           } else {
@@ -428,11 +564,7 @@ const AddUpdateOffer = () => {
           setAllCategories(res.data.data);
         } else {
           const message = res.data.message;
-          if (
-            ["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(
-              message
-            )
-          ) {
+          if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
             alert("Session Expired, please relogin");
             window.location.href = "/session/signin";
           } else {
@@ -462,11 +594,8 @@ const AddUpdateOffer = () => {
             setState(offerData);
             setStatus(offerData.status || 0);
 
-            // Convert "4,5" into [4, 5]
-            if (
-              offerData.category_ids &&
-              typeof offerData.category_ids === "string"
-            ) {
+            // Convert "4,5" into [4, 5] for categories
+            if (offerData.category_ids && typeof offerData.category_ids === "string") {
               const catArray = offerData.category_ids
                 .split(",")
                 .map((str) => Number(str.trim()))
@@ -474,20 +603,24 @@ const AddUpdateOffer = () => {
               setCategoryIds(catArray);
             }
 
-            // Convert "AF,AL" into ["AF", "AL"]
+            // Convert "AF,AL" into ["AF", "AL"] for geo
             if (offerData.geo && typeof offerData.geo === "string") {
               const geoArray = offerData.geo.split(",").map((c) => c.trim());
               setSelectedCountries(geoArray);
             }
+
+            // Set slug if present, otherwise generate from name
+            if (offerData.slug) {
+              setSlug(offerData.slug);
+              setSlugEdited(true); // Mark as manually set
+            } else {
+              const generatedSlug = slugify(offerData.name);
+              setSlug(generatedSlug);
+              setSlugEdited(false); // Mark as auto-generated
+            }
           } else {
             const message = response.data.message;
-            if (
-              [
-                "Invalid Token 1",
-                "Invalid Token 2",
-                "Invalid Token 3",
-              ].includes(message)
-            ) {
+            if (["Invalid Token 1", "Invalid Token 2", "Invalid Token 3"].includes(message)) {
               alert("Session Expired, please relogin");
               window.location.href = "/session/signin";
             } else {
@@ -505,6 +638,7 @@ const AddUpdateOffer = () => {
     }
   }, [id, roleid, location?.state?.data]);
 
+
   // --------------------------------------------------------------------
   // Submit Handler
   // --------------------------------------------------------------------
@@ -521,8 +655,10 @@ const AddUpdateOffer = () => {
     // alert(JSON.stringify(state));
 
     const { category_ids, ...rest } = state;
-    const generatedSlug = slugify(name);
-    setSlug(generatedSlug);
+    const finalSlug = slugEdited ? slug : slugify(state.name);
+    // Update the state so that the success dialog displays the correct slug.
+    setSlug(finalSlug);
+
 
     const formData = new FormData();
     for (const key in rest) {
@@ -531,6 +667,7 @@ const AddUpdateOffer = () => {
 
     // Status
     formData.set("status", status);
+    formData.append("slug", finalSlug);
 
     categoryIds.forEach((catId) => {
       formData.append("category_ids[]", Number(catId));
@@ -557,6 +694,7 @@ const AddUpdateOffer = () => {
           alert(response.data.message);
           // Redirect based on role
           // window.location.href = roleid !== "2" ? "/network" : "/offer";
+
           setOpenShareModal(true);
         } else {
           const message = response.data.message;
@@ -793,8 +931,8 @@ const AddUpdateOffer = () => {
                     value={
                       networks?.length
                         ? networks.find(
-                            (network) => network.id === state.network_id
-                          ) || null
+                          (network) => network.id === state.network_id
+                        ) || null
                         : null
                     }
                     getOptionLabel={(option) => option.name}
@@ -816,7 +954,7 @@ const AddUpdateOffer = () => {
                   />
 
                   {/* Name */}
-                  <TextField
+                  {/* <TextField
                     type="text"
                     name="name"
                     label="Name"
@@ -824,7 +962,27 @@ const AddUpdateOffer = () => {
                     value={name || ""}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
+                  /> */}
+                  <TextField
+                    type="text"
+                    name="name"
+                    label="Name"
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      setState((prev) => ({ ...prev, name: value }));
+
+                      // If slug has not been manually edited, auto-generate it
+                      if (!slugEdited) {
+                        setSlug(slugify(value));
+                      }
+                    }}
+                    value={state.name || ""}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
                   />
+
+
+
 
                   {/* Description */}
                   <TextField
@@ -967,6 +1125,18 @@ const AddUpdateOffer = () => {
                     onChange={handleChange}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
+                  />
+                  <TextField
+                    type="text"
+                    name="slug"
+                    label="Slug"
+                    onChange={(e) => {
+                      setSlug(slugify(e.target.value));
+                      setSlugEdited(true);
+                    }}
+                    value={slug}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
                   />
 
                   {/* Tracking Type (Select) */}

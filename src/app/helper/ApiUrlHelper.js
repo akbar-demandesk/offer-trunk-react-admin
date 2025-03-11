@@ -1,5 +1,6 @@
 // const baseUrl = 'http://localhost:3001/';
 const baseUrl = 'https://api.offertrunk.com/';
+const base_local_url = 'http://localhost:3008/';
 
 const loginUrl = () => {
   return baseUrl + 'api/login';
@@ -43,7 +44,7 @@ const getOffer = () => {
   return baseUrl + 'user/getOffer';
 };
 const addUpdateOffer = () => {
-  return baseUrl + 'user/createUpdateOffer';
+  return base_local_url + 'user/createUpdateOffer';
 };
 const getAllOffers = () => {
   return baseUrl + 'user/getAllOffers';
