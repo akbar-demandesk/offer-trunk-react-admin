@@ -335,15 +335,7 @@ const trackingTypeOptions = [
   { label: "offline", value: "offline" },
 ];
 
-// const slugify = (text) =>
-//   text
-//     .toString()
-//     .toLowerCase()
-//     .trim()
-//     .replace(/\s+/g, "-")
-//     .replace(/[^\w-]+/g, "")
-//     .replace(/--+/g, "-")
-//     .replace(/^-+|-+$/g, "");
+
 const slugify = (text) => {
   return text
     .toLowerCase()
@@ -970,7 +962,6 @@ const AddUpdateOffer = () => {
                       const { value } = e.target;
                       setState((prev) => ({ ...prev, name: value }));
 
-                      // If slug has not been manually edited, auto-generate it
                       if (!slugEdited) {
                         setSlug(slugify(value));
                       }
