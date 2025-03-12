@@ -344,16 +344,15 @@ const trackingTypeOptions = [
 //     .replace(/[^\w-]+/g, "")
 //     .replace(/--+/g, "-")
 //     .replace(/^-+|-+$/g, "");
-const slugify = (text) =>
-  text
-    .toString()
+const slugify = (text) => {
+  return text
     .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, "-")
+    .replace(/-s+/g, "-")
     .trim()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/[^\w-]+/g, "") // Remove special chars
-// .replace(/--+/g, "-") // Replace multiple - with single -
-// .replace(/^-+|-+$/g, ""); // Trim - from start & end
 
+};
 
 const AddUpdateOffer = () => {
   let location = useLocation();
